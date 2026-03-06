@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servers | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #2f3136;
+            --card-bg: #36393f;
+            --text-main: #ffffff;
+            --text-muted: #b9bbbe;
+            --accent-blue: #5865f2;
+            --accent-green: #43b581;
+            --accent-gray: #4f545c;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .server-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-align: center;
+        }
+
+        .server-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+        }
+
+        .server-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            background-color: var(--bg-color);
+            object-fit: cover;
+        }
+
+        .server-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .server-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            width: 80%;
+            transition: opacity 0.2s;
+        }
+
+        .btn-manage {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-invite {
+            background-color: var(--accent-gray);
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .logout-link {
+            margin-top: 40px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .logout-link:hover {
+            color: #f04747;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Twoje serwery</h1>
+
+    <ul class="server-grid">
+        <% guilds.forEach(g => { %>
+            <li class="server-card">
+                <% if (g.icon) { %>
+                    <img class="server-icon" src="https://cdn.discordapp.com/icons/<%= g.id %>/<%= g.icon %>.png?size=128" alt="icon">
+                <% } else { %>
+                    <div class="server-icon" style="background: #4f545c; display: flex; align-items: center; justify-content: center;">
+                        <%= g.name.split(' ').map(n => n[0]).join('') %>
+                    </div>
+                <% } %>
+                
+                <span class="server-name"><%= g.name %></span>
+                <div class="server-info">
+                </div>
+
+                <% if(g.botOnline){ %>
+                    <a href="/dashboard/<%= g.id %>" class="btn btn-manage">Zarzadzaj</a>
+                <% } else { %>
+                    <a href="https://discord.com/api/oauth2/authorize?client_id=1478826976994136275&permissions=8&scope=bot" class="btn btn-invite">Zapros bota</a>
+                <% } %>
+            </li>
+        <% }) %>
+    </ul>
+
+    <a href="/logout" class="logout-link">Wyloguj siê</a>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Bot Dashboard</title>
+
+<style>
+
+body{
+margin:0;
+font-family:sans-serif;
+background:#1e1f22;
+color:white;
+}
+
+.sidebar{
+width:220px;
+height:100vh;
+background:#2b2d31;
+position:fixed;
+padding:20px;
+}
+
+.sidebar h2{
+color:#5865F2;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+margin:10px 0;
+}
+
+.content{
+margin-left:240px;
+padding:30px;
+}
+
+.card{
+background:#2b2d31;
+padding:20px;
+border-radius:8px;
+margin-bottom:20px;
+}
+
+button{
+background:#5865F2;
+border:none;
+padding:8px 15px;
+border-radius:5px;
+color:white;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>Bot Panel</h2>
+
+<a href="/dashboard">Dashboard</a>
+<a href="/servers">Serwery</a>
+
+</div>
+
+<div class="content">
+
+<%- body %>
+
+</div>
+
+</body>
+</html>

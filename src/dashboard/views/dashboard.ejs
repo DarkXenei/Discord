@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | <%= guildName %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-darker: #202225;
+            --bg-main: #2f3136;
+            --bg-card: #36393f;
+            --sidebar-width: 260px;
+            --navbar-height: 60px;
+            --accent-blue: #00a8fc;
+            --accent-green: #43b581;
+            --text-main: #ffffff;
+            --text-muted: #b9bbbe;
+            --border-color: #202225;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--navbar-height);
+            background-color: var(--bg-darker);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .nav-user-container { display: flex; gap: 20px; align-items: center; }
+
+        .dropdown { position: relative; cursor: pointer; }
+        .dropdown-trigger {
+            display: flex; align-items: center; gap: 10px;
+            padding: 5px 10px; border-radius: 4px; transition: background 0.2s;
+        }
+        .dropdown-trigger:hover { background: rgba(255,255,255,0.05); }
+        .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+
+        .dropdown-content {
+            display: none; position: absolute; right: 0; top: 110%;
+            background-color: var(--bg-darker); min-width: 200px;
+            border-radius: 4px; border: 1px solid #444; overflow: hidden;
+        }
+        .dropdown-content a {
+            color: var(--text-main); padding: 12px 16px;
+            text-decoration: none; display: block; font-size: 0.9rem;
+        }
+        .dropdown-content a:hover { background-color: var(--accent-blue); }
+        .show { display: block; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-darker);
+            height: 100vh;
+            position: fixed;
+            top: var(--navbar-height); left: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar-category { margin-bottom: 5px; }
+        .category-title {
+            padding: 10px 20px; color: var(--text-muted);
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            cursor: pointer; display: flex; justify-content: space-between;
+        }
+        .category-title::after { content: '▾'; transition: transform 0.2s; }
+        .sidebar-category.collapsed .category-title::after { transform: rotate(-90deg); }
+        .sidebar-category.collapsed .sidebar-item { display: none; }
+
+        .sidebar-item {
+            padding: 10px 30px; color: var(--text-muted);
+            text-decoration: none; display: block; font-size: 0.95rem;
+        }
+        .sidebar-item:hover, .sidebar-item.active {
+            background-color: rgba(255,255,255,0.05); color: white;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--navbar-height);
+            padding: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .dashboard-grid {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+            flex-wrap: wrap;
+        }
+
+        /* --- CARDS --- */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            flex: 1;
+            min-width: 350px;
+            height: fit-content;
+        }
+
+        .card-header {
+            background-color: rgba(0,0,0,0.2);
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body { padding: 25px; }
+
+        h2 { margin: 0 0 20px 0; font-size: 1.5rem; }
+        label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 1.1rem; }
+        .help-text { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; }
+
+        /* --- INPUT GROUPS --- */
+        .input-group { display: flex; margin-bottom: 25px; }
+        .input-group input {
+            flex: 1; background: var(--bg-darker); border: 1px solid var(--border-color);
+            color: white; padding: 12px; border-radius: 4px 0 0 4px; font-size: 1rem;
+        }
+        .btn-action {
+            border: none; background: var(--accent-blue); color: white;
+            padding: 0 20px; border-radius: 0 4px 4px 0;
+            font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-action:hover { opacity: 0.8; }
+
+        /* --- TABLES --- */
+        .actions-table {
+            width: 100%; border-collapse: collapse; font-size: 0.9rem;
+        }
+        .actions-table th {
+            text-align: left; padding: 12px; color: var(--text-muted);
+            border-bottom: 2px solid var(--border-color);
+        }
+        .actions-table td { padding: 12px; border-bottom: 1px solid var(--border-color); }
+
+        @media (max-width: 900px) {
+            .main-content { margin-left: 0; }
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-user-container">
+            <div class="dropdown">
+                <div class="dropdown-trigger" onclick="toggleDropdown('serverDrop')">
+                    <% if (guildIcon) { %>
+                        <img src="https://cdn.discordapp.com/icons/<%= guildId %>/<%= guildIcon %>.png" class="nav-avatar" alt="">
+                    <% } else { %>
+                        <div class="nav-avatar" style="background:#4f545c; display:flex; align-items:center; justify-content:center;">?</div>
+                    <% } %>
+                    <span><%= guildName %> ▾</span>
+                </div>
+                <div id="serverDrop" class="dropdown-content">
+                    <% guilds.forEach(g => { %>
+                        <a href="/dashboard/<%= g.id %>"><%= g.name %></a>
+                    <% }) %>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="dropdown-trigger" onclick="toggleDropdown('userDrop')">
+                    <img src="<%= userAvatar %>" class="nav-avatar" alt="">
+                    <span><%= userName %> ▾</span>
+                </div>
+                <div id="userDrop" class="dropdown-content">
+                    <a href="/servers">Moje Serwery</a>
+                    <a href="/logout" style="color: #ff4747;">Wyloguj się</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-category">
+            <div class="category-title">Ustawienia</div>
+            <a href="#" class="sidebar-item active">Główne</a>
+            <a href="#" class="sidebar-item">Komendy</a>
+        </div>
+        
+        <div class="sidebar-category">
+            <div class="category-title">Moderacja</div>
+            <a href="#" class="sidebar-item">Auto Moderacja</a>
+            <a href="#" class="sidebar-item">Logi</a>
+            <a href="#" class="sidebar-item">Embeds</a>
+            <a href="#" class="sidebar-item">Powitania</a>
+            <a href="#" class="sidebar-item">Automatyzacja</a>
+        </div>
+
+        <div class="sidebar-category">
+            <div class="category-title">Role</div>
+            <a href="#" class="sidebar-item">Reaction roles</a>
+            <a href="#" class="sidebar-item">Autorole</a>
+        </div>
+
+        <div class="sidebar-category">
+            <div class="category-title">Powiadomienia</div>
+            <a href="#" class="sidebar-item">Twitch</a>
+            <a href="#" class="sidebar-item">YouTube</a>
+            <a href="#" class="sidebar-item">TikTok</a>
+            <a href="#" class="sidebar-item">Kick</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="dashboard-grid">
+            
+<div class="card">
+    <div class="card-header">⚙️ Bot Settings</div>
+    <div class="card-body">
+        
+        <div style="margin-bottom: 30px;">
+            <label>Nickname</label>
+            <p class="help-text">Set the bot's display name in the server.</p>
+            <form action="/dashboard/<%= guildId %>/nickname" method="POST" class="input-group">
+                <input type="text" name="nickname" placeholder="Panda" value="<%= settings.nickname || '' %>">
+                <button type="submit" class="btn-action">Apply</button>
+            </form>
+        </div>
+
+        <div>
+            <label>Custom Prefix</label>
+            <p class="help-text">Set one or more prefix</p>
+            <form action="/dashboard/<%= guildId %>/prefix/add" method="POST" class="input-group">
+                <input type="text" name="newPrefix" placeholder="Enter a prefix" value="<%= settings.prefixes && settings.prefixes.length ? settings.prefixes[0] : '!' %>">
+                <button type="submit" class="btn-action">Add</button>
+            </form>
+
+            <div style="margin-top: 10px; background: var(--bg-darker); border-radius: 4px; border: 1px solid var(--border-color);">
+                <% if (settings.prefixes && settings.prefixes.length > 0) { %>
+                    <% settings.prefixes.forEach(prefix => { %>
+                        <div style="padding: 12px 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 500;"><%= prefix %></span>
+                            <form action="/dashboard/<%= guildId %>/prefix/delete" method="POST" style="margin: 0;">
+                                <input type="hidden" name="prefixToDelete" value="<%= prefix %>">
+                                <button type="submit" style="background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.1rem;">🗑️</button>
+                            </form>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">No custom prefixes set.</div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <div class="card">
+                <div class="card-header">📊 Ostatnie Akcje</div>
+                <div class="card-body">
+                    <h2>Recent actions</h2>
+<div style="display:flex; gap:10px; margin-bottom:15px;">
+<input id="filterUser" placeholder="Filter user"
+style="flex:1; background:var(--bg-darker); border:1px solid var(--border-color); color:white; padding:8px; border-radius:4px;">
+
+<input id="filterAction" placeholder="Filter action"
+style="flex:1; background:var(--bg-darker); border:1px solid var(--border-color); color:white; padding:8px; border-radius:4px;">
+
+<button onclick="loadLogs()" class="btn-action">Filter</button>
+</div>
+                    <table class="actions-table">
+                        <thead>
+                            <tr>
+                                <th>Wykonano</th>
+                                <th>Użytkownik</th>
+                                <th>Akcja</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTable"></tbody>
+                    </table>
+                    <p style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.8rem;">To wszystkie ostatnie rekordy.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Dropdowny w navbarze
+        function toggleDropdown(id) {
+            document.querySelectorAll('.dropdown-content').forEach(d => {
+                if(d.id !== id) d.classList.remove('show');
+            });
+            document.getElementById(id).classList.toggle('show');
+        }
+
+        // Zwijanie sidebaru
+        document.querySelectorAll('.category-title').forEach(title => {
+            title.addEventListener('click', () => {
+                title.parentElement.classList.toggle('collapsed');
+            });
+        });
+
+        // Kliknięcie poza dropdown zamyka go
+        window.onclick = function(event) {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+            }
+        }
+
+async function loadLogs(){
+
+const user = document.getElementById("filterUser").value
+const action = document.getElementById("filterAction").value
+
+const res = await fetch(`/dashboard/<%= guildId %>/logs?user=${user}&action=${action}`)
+const logs = await res.json()
+
+const table = document.getElementById("logsTable")
+
+table.innerHTML = ""
+
+logs.forEach(log=>{
+
+const date = new Date(log.date).toLocaleString()
+
+table.innerHTML += `
+<tr>
+<td style="color:var(--text-muted)">${date}</td>
+<td>${log.userName}</td>
+<td style="color:var(--accent-blue)">${log.action}</td>
+</tr>
+`
+
+})
+
+}
+
+loadLogs()
+
+    </script>
+</body>
+</html>
